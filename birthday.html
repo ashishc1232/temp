@@ -1,0 +1,321 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>For You 🌸</title>
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,700;1,400;1,700&family=Cormorant+Garamond:ital,wght@0,300;0,400;1,300;1,400&family=Dancing+Script:wght@500;700&family=Tenor+Sans&display=swap" rel="stylesheet">
+<style>
+:root{--bg:#0c0812;--rose:#d4637a;--blush:#f2aab8;--gold:#c9a96e;--cream:#f5e6d3;--wine:#7a2d4a;}
+*,*::before,*::after{margin:0;padding:0;box-sizing:border-box;}
+html{scroll-behavior:smooth;}
+body{background:var(--bg);font-family:'Cormorant Garamond',serif;color:var(--cream);overflow-x:hidden;}
+::selection{background:rgba(212,99,122,.3);}
+::-webkit-scrollbar{width:3px;}
+::-webkit-scrollbar-track{background:var(--bg);}
+::-webkit-scrollbar-thumb{background:linear-gradient(var(--rose),var(--gold));border-radius:2px;}
+#c-stars,#c-petals{position:fixed;inset:0;pointer-events:none;}
+#c-stars{z-index:0;}#c-petals{z-index:1;}
+
+/* LOADER */
+#loader{position:fixed;inset:0;z-index:9999;background:var(--bg);display:flex;flex-direction:column;align-items:center;justify-content:center;gap:30px;transition:opacity .9s ease,visibility .9s ease;}
+#loader.hide{opacity:0;visibility:hidden;}
+.ld-ring{position:relative;width:110px;height:110px;}
+.ld-ring svg{position:absolute;inset:0;}
+.ld-ring svg.outer{animation:spinR 2.6s linear infinite;}
+.ld-ring svg.outer circle{fill:none;stroke:var(--gold);stroke-width:1.2;stroke-dasharray:260;stroke-dashoffset:190;stroke-linecap:round;}
+.ld-ring svg.inner{width:76px;height:76px;top:17px;left:17px;animation:spinR 1.9s linear infinite reverse;}
+.ld-ring svg.inner circle{fill:none;stroke:var(--rose);stroke-width:1.2;stroke-dasharray:180;stroke-dashoffset:130;stroke-linecap:round;}
+.ld-heart{position:absolute;top:50%;left:50%;transform:translate(-50%,-50%);font-size:1.7rem;animation:hbeat 1.2s ease-in-out infinite;}
+.ld-main{font-family:'Dancing Script',cursive;font-size:1.6rem;color:var(--gold);opacity:0;animation:fadeUp .7s ease .3s forwards;}
+.ld-hint{font-family:'Tenor Sans',sans-serif;font-size:.62rem;letter-spacing:5px;text-transform:uppercase;color:rgba(201,169,110,.35);opacity:0;animation:fadeUp .7s ease .6s forwards;}
+.ld-track{width:180px;height:1px;background:rgba(255,255,255,.06);overflow:hidden;}
+.ld-fill{height:100%;width:0;background:linear-gradient(90deg,var(--rose),var(--gold));animation:ldbar 2.3s cubic-bezier(.4,0,.2,1) forwards;box-shadow:0 0 10px rgba(201,169,110,.5);}
+@keyframes spinR{to{transform:rotate(360deg);}}
+@keyframes hbeat{0%,100%{transform:translate(-50%,-50%) scale(1);}50%{transform:translate(-50%,-50%) scale(1.28);}}
+@keyframes ldbar{0%{width:0;}80%{width:88%;}100%{width:100%;}}
+
+/* LOCK */
+#lock{position:fixed;inset:0;z-index:500;display:none;align-items:center;justify-content:center;background:radial-gradient(ellipse at 50% 38%,#1e0a1e 0%,#0c0812 68%);transition:opacity .85s ease,transform .85s ease;}
+#lock.show{display:flex;}
+#lock.unlock{opacity:0;transform:scale(1.07) translateY(-12px);pointer-events:none;}
+.lg{width:min(400px,92vw);padding:54px 44px 44px;background:linear-gradient(145deg,rgba(255,255,255,.042),rgba(255,255,255,.01));border:1px solid rgba(201,169,110,.16);backdrop-filter:blur(18px);text-align:center;position:relative;}
+.lgc{position:absolute;width:22px;height:22px;border-color:rgba(201,169,110,.22);border-style:solid;}
+.lgc.tl{top:13px;left:13px;border-width:1px 0 0 1px;}.lgc.tr{top:13px;right:13px;border-width:1px 1px 0 0;}
+.lgc.bl{bottom:13px;left:13px;border-width:0 0 1px 1px;}.lgc.br{bottom:13px;right:13px;border-width:0 1px 1px 0;}
+.lg-icon{font-size:3rem;display:block;margin-bottom:8px;animation:float 4s ease-in-out infinite;filter:drop-shadow(0 0 18px rgba(212,99,122,.45));}
+.lg-eye{font-family:'Tenor Sans',sans-serif;font-size:.62rem;letter-spacing:6px;text-transform:uppercase;color:rgba(201,169,110,.42);margin-bottom:18px;}
+.lg-title{font-family:'Playfair Display',serif;font-size:1.75rem;font-weight:400;color:var(--cream);margin-bottom:8px;}
+.lg-sub{font-style:italic;font-size:1rem;color:rgba(242,170,184,.5);margin-bottom:36px;line-height:1.55;}
+.pdots{display:flex;justify-content:center;gap:16px;margin-bottom:28px;}
+.pd{width:12px;height:12px;border-radius:50%;border:1.5px solid rgba(201,169,110,.28);transition:all .25s;}
+.pd.on{background:var(--gold);border-color:var(--gold);box-shadow:0 0 14px rgba(201,169,110,.7);transform:scale(1.18);}
+.kpad{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;max-width:228px;margin:0 auto 14px;}
+.kb{background:rgba(255,255,255,.028);border:1px solid rgba(201,169,110,.09);color:rgba(245,230,211,.78);font-family:'Playfair Display',serif;font-size:1.35rem;padding:15px 10px;cursor:pointer;transition:all .15s;position:relative;overflow:hidden;}
+.kb::after{content:'';position:absolute;inset:0;background:radial-gradient(circle at center,rgba(201,169,110,.18),transparent 70%);opacity:0;transition:opacity .2s;}
+.kb:hover{border-color:rgba(201,169,110,.33);color:var(--gold);transform:translateY(-2px);}.kb:hover::after{opacity:1;}.kb:active{transform:scale(.92);}
+.perr{font-style:italic;font-size:.88rem;color:var(--rose);height:18px;opacity:0;transition:opacity .3s;}
+.perr.show{opacity:1;}
+@keyframes shakeX{0%,100%{transform:translateX(0);}20%{transform:translateX(-9px);}40%{transform:translateX(9px);}60%{transform:translateX(-5px);}80%{transform:translateX(5px);}}
+.shake{animation:shakeX .38s ease;}
+
+/* PAGE */
+#page{display:none;position:relative;z-index:2;}
+.hero{min-height:100vh;display:flex;flex-direction:column;align-items:center;justify-content:center;text-align:center;padding:70px 24px;position:relative;overflow:hidden;}
+.hg{position:absolute;border-radius:50%;filter:blur(90px);pointer-events:none;}
+.hg1{width:520px;height:520px;background:radial-gradient(circle,rgba(122,45,74,.38),transparent 70%);top:-110px;left:-130px;animation:dA 13s ease-in-out infinite alternate;}
+.hg2{width:420px;height:420px;background:radial-gradient(circle,rgba(201,169,110,.13),transparent 70%);bottom:-90px;right:-70px;animation:dB 11s ease-in-out infinite alternate;}
+.hg3{width:300px;height:300px;background:radial-gradient(circle,rgba(180,157,200,.1),transparent 70%);top:45%;left:50%;animation:dC 15s ease-in-out infinite alternate;}
+@keyframes dA{to{transform:translate(70px,90px);}}@keyframes dB{to{transform:translate(-55px,-65px);}}@keyframes dC{to{transform:translate(-45px,45px);}}
+.h-eyebrow{font-family:'Tenor Sans',sans-serif;font-size:.63rem;letter-spacing:7px;text-transform:uppercase;color:rgba(201,169,110,.45);margin-bottom:22px;opacity:0;animation:fadeUp .9s ease .2s forwards;}
+.h-name{font-family:'Dancing Script',cursive;font-size:clamp(4.5rem,14vw,10rem);font-weight:700;line-height:1;background:linear-gradient(135deg,#c9a96e 0%,#f2aab8 42%,#c9a96e 72%,#fff 100%);background-size:260% auto;-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;animation:shimmer 5s linear infinite,fadeUp 1s ease .4s both;margin-bottom:14px;}
+.h-div{display:flex;align-items:center;gap:18px;margin-bottom:26px;opacity:0;animation:fadeUp .9s ease .6s forwards;}
+.h-div .hl{width:55px;height:1px;background:linear-gradient(90deg,transparent,rgba(201,169,110,.38));}
+.h-div .hr{width:55px;height:1px;background:linear-gradient(270deg,transparent,rgba(201,169,110,.38));}
+.h-div span{color:var(--rose);font-size:1.1rem;animation:pulse 1.9s ease-in-out infinite;}
+.h-tag{font-family:'Playfair Display',serif;font-size:clamp(1.1rem,3vw,1.65rem);font-style:italic;color:rgba(242,170,184,.78);margin-bottom:12px;opacity:0;animation:fadeUp .9s ease .7s forwards;}
+.h-sub{font-family:'Tenor Sans',sans-serif;font-size:.68rem;letter-spacing:5px;text-transform:uppercase;color:rgba(201,169,110,.36);opacity:0;animation:fadeUp .9s ease .9s forwards;margin-bottom:60px;}
+.h-scroll{display:flex;flex-direction:column;align-items:center;gap:8px;color:rgba(201,169,110,.3);font-family:'Tenor Sans',sans-serif;font-size:.6rem;letter-spacing:4px;text-transform:uppercase;opacity:0;animation:fadeUp .9s ease 1.2s forwards;}
+.sline{width:1px;height:52px;background:linear-gradient(var(--gold),transparent);animation:sPulse 1.7s ease-in-out infinite;}
+@keyframes sPulse{0%,100%{opacity:.3;transform:scaleY(1);}50%{opacity:.9;transform:scaleY(1.2);}}
+section{position:relative;z-index:2;}
+.s-eye{font-family:'Tenor Sans',sans-serif;font-size:.61rem;letter-spacing:6px;text-transform:uppercase;color:rgba(201,169,110,.38);text-align:center;margin-bottom:10px;}
+.s-head{font-family:'Playfair Display',serif;font-size:clamp(1.8rem,5vw,3.1rem);font-weight:400;text-align:center;color:var(--cream);margin-bottom:58px;line-height:1.2;}
+.s-head em{font-style:italic;color:var(--gold);}
+.qband{padding:110px 24px;background:linear-gradient(180deg,var(--bg) 0%,#160d22 50%,var(--bg) 100%);text-align:center;}
+.qmark{font-family:'Playfair Display',serif;font-size:8rem;line-height:.4;color:rgba(201,169,110,.08);display:block;margin-bottom:32px;}
+.qt{font-family:'Playfair Display',serif;font-style:italic;font-size:clamp(1.35rem,3.8vw,2.2rem);color:var(--cream);max-width:700px;margin:0 auto 28px;line-height:1.75;}
+.qa{font-family:'Tenor Sans',sans-serif;font-size:.68rem;letter-spacing:5px;color:rgba(201,169,110,.38);text-transform:uppercase;}
+.qs{padding:110px 24px;background:var(--bg);}
+.qgrid{display:grid;grid-template-columns:repeat(auto-fit,minmax(256px,1fr));gap:1px;max-width:960px;margin:0 auto;background:rgba(201,169,110,.055);border:1px solid rgba(201,169,110,.055);}
+.qc{background:var(--bg);padding:46px 36px;transition:background .4s;position:relative;overflow:hidden;}
+.qc::before{content:'';position:absolute;top:0;left:0;right:0;height:2px;background:linear-gradient(90deg,transparent,var(--rose),transparent);transform:scaleX(0);transition:transform .5s;}
+.qc:hover{background:rgba(255,255,255,.024);}.qc:hover::before{transform:scaleX(1);}
+.qi{font-size:2rem;margin-bottom:14px;display:block;}
+.qn{font-family:'Tenor Sans',sans-serif;font-size:.58rem;letter-spacing:4px;color:rgba(201,169,110,.28);margin-bottom:10px;display:block;}
+.qtt{font-family:'Playfair Display',serif;font-size:1.22rem;font-style:italic;color:var(--gold);margin-bottom:10px;}
+.qb{font-size:.98rem;color:rgba(245,230,211,.52);line-height:1.82;}
+.pband{height:300px;position:relative;overflow:hidden;background:linear-gradient(135deg,#1e0a1e 0%,#0c1a2e 100%);display:flex;align-items:center;justify-content:center;}
+.pband::before{content:'';position:absolute;inset:0;background:radial-gradient(ellipse at 30% 50%,rgba(122,45,74,.42) 0%,transparent 60%),radial-gradient(ellipse at 70% 50%,rgba(12,26,46,.6) 0%,transparent 60%);}
+.pc{position:relative;z-index:1;text-align:center;}
+.pbig{font-family:'Dancing Script',cursive;font-size:clamp(2.8rem,9vw,6.5rem);background:linear-gradient(135deg,rgba(201,169,110,.22),rgba(242,170,184,.3),rgba(201,169,110,.22));-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;}
+.psub{font-family:'Tenor Sans',sans-serif;font-size:.63rem;letter-spacing:7px;color:rgba(201,169,110,.22);text-transform:uppercase;margin-top:10px;}
+.lsec{padding:110px 24px;background:linear-gradient(180deg,var(--bg) 0%,#160d22 100%);display:flex;justify-content:center;}
+.lwrap{max-width:680px;width:100%;position:relative;}
+.lwrap::before{content:'';position:absolute;top:-50px;left:-50px;right:-50px;bottom:-50px;background:radial-gradient(ellipse at 50% 50%,rgba(122,45,74,.14),transparent 70%);pointer-events:none;}
+.lpaper{background:linear-gradient(160deg,rgba(255,255,255,.034),rgba(255,255,255,.01));border:1px solid rgba(201,169,110,.13);padding:62px 54px;position:relative;}
+.lpc{position:absolute;width:24px;height:24px;border-color:rgba(201,169,110,.22);border-style:solid;}
+.lpc.tl{top:14px;left:14px;border-width:1px 0 0 1px;}.lpc.tr{top:14px;right:14px;border-width:1px 1px 0 0;}
+.lpc.bl{bottom:14px;left:14px;border-width:0 0 1px 1px;}.lpc.br{bottom:14px;right:14px;border-width:0 1px 1px 0;}
+.ldate{font-family:'Tenor Sans',sans-serif;font-size:.66rem;letter-spacing:4px;color:rgba(201,169,110,.38);text-transform:uppercase;margin-bottom:36px;}
+.lbody{font-size:clamp(1rem,2vw,1.14rem);color:rgba(245,230,211,.7);line-height:2.05;font-weight:300;}
+.lbody p{margin-bottom:22px;}
+.lbody .hi{font-style:italic;color:var(--blush);font-size:1.06em;}
+.lsign{margin-top:44px;text-align:right;border-top:1px solid rgba(201,169,110,.09);padding-top:28px;}
+.lsign .from{display:block;font-family:'Tenor Sans',sans-serif;font-size:.61rem;letter-spacing:4px;color:rgba(201,169,110,.32);text-transform:uppercase;margin-bottom:8px;}
+.lsign .sig{font-family:'Dancing Script',cursive;font-size:2.4rem;color:var(--gold);filter:drop-shadow(0 0 14px rgba(201,169,110,.3));}
+.wsec{padding:110px 24px;background:var(--bg);}
+.wlist{max-width:720px;margin:0 auto;}
+.wrow{display:grid;grid-template-columns:58px 1fr;padding:28px 0;border-bottom:1px solid rgba(201,169,110,.07);transition:all .3s;cursor:default;}
+.wrow:first-child{border-top:1px solid rgba(201,169,110,.07);}
+.wrow:hover{padding-left:10px;}.wrow:hover .wn{color:var(--gold);}
+.wn{font-family:'Playfair Display',serif;font-style:italic;font-size:2.1rem;color:rgba(201,169,110,.11);line-height:1.4;transition:color .3s;}
+.wt{font-size:clamp(1rem,2.2vw,1.13rem);color:rgba(245,230,211,.62);line-height:1.82;padding-top:6px;font-style:italic;}
+.fnl{padding:130px 24px 110px;text-align:center;position:relative;overflow:hidden;background:radial-gradient(ellipse at 50% 60%,#200a28 0%,#0c0812 58%);}
+#cfw{position:absolute;inset:0;pointer-events:none;}
+.fnl-big{font-family:'Dancing Script',cursive;font-size:clamp(3.8rem,12vw,8.5rem);font-weight:700;background:linear-gradient(135deg,var(--gold) 0%,var(--blush) 35%,#fff 60%,var(--gold) 100%);background-size:300% auto;-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;animation:shimmer 3.5s linear infinite;line-height:1;margin-bottom:18px;position:relative;z-index:1;}
+.fnl-heart{font-size:5.5rem;display:block;animation:heartBeat 1.1s ease-in-out infinite;filter:drop-shadow(0 0 32px rgba(212,99,122,.7));position:relative;z-index:1;margin:20px 0;}
+.fnl-sub{font-family:'Tenor Sans',sans-serif;font-size:.64rem;letter-spacing:7px;text-transform:uppercase;color:rgba(201,169,110,.38);position:relative;z-index:1;}
+.sr{opacity:0;transform:translateY(44px);transition:opacity .85s cubic-bezier(.25,.8,.25,1),transform .85s cubic-bezier(.25,.8,.25,1);}
+.sr.sl{transform:translateX(-44px);}.sr.sr2{transform:translateX(44px);}.sr.sc{transform:scale(.9);}
+.sr.in{opacity:1;transform:translate(0) scale(1);}
+@keyframes float{0%,100%{transform:translateY(0);}50%{transform:translateY(-14px);}}
+@keyframes pulse{0%,100%{transform:scale(1);}50%{transform:scale(1.38);}}
+@keyframes heartBeat{0%,100%{transform:scale(1);}14%{transform:scale(1.2);}28%{transform:scale(1);}42%{transform:scale(1.1);}}
+@keyframes shimmer{0%{background-position:0% center;}100%{background-position:300% center;}}
+@keyframes fadeUp{from{opacity:0;transform:translateY(26px);}to{opacity:1;transform:translateY(0);}}
+@media(max-width:540px){.lg{padding:40px 22px 36px;}.lpaper{padding:38px 22px;}.qc{padding:30px 22px;}}
+</style>
+</head>
+<body>
+<canvas id="c-stars"></canvas>
+<canvas id="c-petals"></canvas>
+
+<div id="loader">
+  <div class="ld-ring">
+    <svg class="outer" viewBox="0 0 110 110" width="110" height="110"><circle cx="55" cy="55" r="48"/></svg>
+    <svg class="inner" viewBox="0 0 76 76" width="76" height="76"><circle cx="38" cy="38" r="32"/></svg>
+    <div class="ld-heart">🌸</div>
+  </div>
+  <div style="display:flex;flex-direction:column;align-items:center;gap:6px;">
+    <span class="ld-main">With Love</span>
+    <span class="ld-hint">Something beautiful awaits</span>
+  </div>
+  <div class="ld-track"><div class="ld-fill"></div></div>
+</div>
+
+<div id="lock">
+  <div class="lg" id="lglass">
+    <div class="lgc tl"></div><div class="lgc tr"></div><div class="lgc bl"></div><div class="lgc br"></div>
+    <span class="lg-icon">🌷</span>
+    <p class="lg-eye">A little something</p>
+    <h1 class="lg-title">Just for you</h1>
+    <p class="lg-sub">Enter your special code<br>to open this page</p>
+    <div class="pdots" id="pdots">
+      <div class="pd" id="pd0"></div><div class="pd" id="pd1"></div><div class="pd" id="pd2"></div><div class="pd" id="pd3"></div>
+    </div>
+    <div class="kpad">
+      <button class="kb" onclick="kp('1')">1</button><button class="kb" onclick="kp('2')">2</button><button class="kb" onclick="kp('3')">3</button>
+      <button class="kb" onclick="kp('4')">4</button><button class="kb" onclick="kp('5')">5</button><button class="kb" onclick="kp('6')">6</button>
+      <button class="kb" onclick="kp('7')">7</button><button class="kb" onclick="kp('8')">8</button><button class="kb" onclick="kp('9')">9</button>
+      <button class="kb" onclick="kpClear()">✕</button><button class="kb" onclick="kp('0')">0</button><button class="kb" onclick="kpDel()">⌫</button>
+    </div>
+    <p class="perr" id="perr">Try again, beautiful ✨</p>
+  </div>
+</div>
+
+<div id="page">
+  <section class="hero">
+    <div class="hg hg1"></div><div class="hg hg2"></div><div class="hg hg3"></div>
+    <p class="h-eyebrow">Celebrating you today</p>
+    <h1 class="h-name">Happy Birthday Harshu</h1>
+    <div class="h-div"><div class="hl"></div><span>♥</span><div class="hr"></div></div>
+    <p class="h-tag">You are the poem the universe wrote perfectly.</p>
+    <p class="h-sub">On this beautiful day</p>
+    <div class="h-scroll"><div class="sline"></div>scroll</div>
+  </section>
+
+  <section class="qband">
+    <div class="sr">
+      <span class="qmark">"</span>
+      <p class="qt">She is my best friend—wild at heart, rare in spirit, and far too beautiful to ever be forgotten.</p>
+      <p class="qa">— written for you</p>
+    </div>
+  </section>
+
+  <section class="qs">
+    <p class="s-eye sr">Every part of you</p>
+    <h2 class="s-head sr">What makes you <em>extraordinary</em></h2>
+    <div class="qgrid">
+      <div class="qc sr"><span class="qi">🌹</span><span class="qn">01</span><h3 class="qtt">Your Smile</h3><p class="qb">It arrives like sunrise — quietly, then all at once, filling every corner of the room with warmth.</p></div>
+      <div class="qc sr" style="transition-delay:.1s"><span class="qi">🌙</span><span class="qn">02</span><h3 class="qtt">Your Mind</h3><p class="qb">The way you think, notice, understand — a rare gift that sets you apart from everyone else.</p></div>
+      <div class="qc sr" style="transition-delay:.2s"><span class="qi">✨</span><span class="qn">03</span><h3 class="qtt">Your Light</h3><p class="qb">You radiate something that can't be taught or faked — genuine warmth that pulls everyone in.</p></div>
+      <div class="qc sr" style="transition-delay:.3s"><span class="qi">🎶</span><span class="qn">04</span><h3 class="qtt">Your Voice</h3><p class="qb">When you speak, something in the air softens. Every word carries more than its meaning.</p></div>
+      <div class="qc sr" style="transition-delay:.4s"><span class="qi">🌺</span><span class="qn">05</span><h3 class="qtt">Your Heart</h3><p class="qb">Generous without being asked. Kind without an audience. The rarest kind of beautiful.</p></div>
+      <div class="qc sr" style="transition-delay:.5s"><span class="qi">💫</span><span class="qn">06</span><h3 class="qtt">Your Presence</h3><p class="qb">Rooms feel different when you're in them. That energy — entirely yours, entirely unforgettable.</p></div>
+    </div>
+  </section>
+
+  <div class="pband">
+    <div class="pc sr sc">
+      <p class="pbig">You are the reason</p>
+      <p class="psub">stars shine a little brighter tonight</p>
+    </div>
+  </div>
+
+  <section class="lsec">
+    <div class="lwrap">
+      <div class="lpaper sr">
+        <div class="lpc tl"></div><div class="lpc tr"></div><div class="lpc bl"></div><div class="lpc br"></div>
+        <p class="ldate">On your birthday</p>
+        <div class="lbody">
+          <p>My dearest,</p>
+          <p>I have been thinking about what to say — and everything I write feels too small for what I mean.</p>
+          <p>So let me say this simply: <span class="hi">you are one of the most remarkable people I have ever known.</span></p>
+          <p>The way you move through the world — with that quiet grace, that brilliant spark, that warmth you carry like it costs you nothing — it leaves a mark on everyone lucky enough to know you.</p>
+          <p>Today, slow down. Feel celebrated. Let people pour into you the way you always pour into them.</p>
+          <p class="hi" style="text-align:center;display:block;font-size:1.1em;margin:26px 0;">You deserve every beautiful thing this life holds.</p>
+          <p>Happy birthday. May this year be the chapter where every dream you've been quietly carrying finally begins.</p>
+        </div>
+        <div class="lsign">
+          <span class="from">With all my heart</span>
+          <span class="sig">Forever yours ♥</span>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <section class="wsec">
+    <p class="s-eye sr">Birthday wishes</p>
+    <h2 class="s-head sr">Everything I wish for <em>you</em></h2>
+    <div class="wlist">
+      <div class="wrow sr"><span class="wn">I</span><p class="wt">May every morning this year arrive with something that makes you smile before you've even had your coffee.</p></div>
+      <div class="wrow sr" style="transition-delay:.1s"><span class="wn">II</span><p class="wt">May you be surrounded always by people who truly see you — and love every single thing they see.</p></div>
+      <div class="wrow sr" style="transition-delay:.2s"><span class="wn">III</span><p class="wt">May your dreams stop being distant and start being real — one beautiful, golden step at a time.</p></div>
+      <div class="wrow sr" style="transition-delay:.3s"><span class="wn">IV</span><p class="wt">May you always know your worth — and never settle for anything less than what you deserve.</p></div>
+      <div class="wrow sr" style="transition-delay:.4s"><span class="wn">V</span><p class="wt">May this year hold something so unexpectedly wonderful, it takes your breath completely away.</p></div>
+    </div>
+  </section>
+
+  <section class="fnl">
+    <canvas id="cfw"></canvas>
+    <span class="fnl-heart sr sc">♥</span>
+    <h2 class="fnl-big sr">Happy Birthday Dear</h2>
+    <p class="fnl-sub sr">I love you</p>
+  </section>
+</div>
+
+<script>
+const SC=document.getElementById('c-stars'),sx=SC.getContext('2d');
+let ST=[];
+function rStar(){SC.width=innerWidth;SC.height=innerHeight;ST=Array.from({length:200},()=>({x:Math.random()*SC.width,y:Math.random()*SC.height,r:Math.random()*1.4+.2,ph:Math.random()*Math.PI*2,sp:Math.random()*.006+.002}));}
+function dStar(t){sx.clearRect(0,0,SC.width,SC.height);ST.forEach(s=>{const a=.2+.6*Math.sin(t*s.sp+s.ph);sx.beginPath();sx.arc(s.x,s.y,s.r,0,Math.PI*2);sx.fillStyle=`rgba(255,240,210,${a})`;sx.fill();});requestAnimationFrame(dStar);}
+rStar();requestAnimationFrame(dStar);window.addEventListener('resize',rStar);
+
+const PC=document.getElementById('c-petals'),px=PC.getContext('2d');
+let petals=[];
+function rPC(){PC.width=innerWidth;PC.height=innerHeight;}
+rPC();window.addEventListener('resize',rPC);
+class Petal{constructor(){this.reset();this.y=Math.random()*PC.height;}reset(){this.x=Math.random()*PC.width;this.y=-20;this.r=3+Math.random()*5;this.vy=.4+Math.random()*1.1;this.vx=(Math.random()-.5)*.7;this.spin=(Math.random()-.5)*.038;this.angle=Math.random()*Math.PI*2;this.a=.5+Math.random()*.4;this.rose=Math.random()>.45;}update(){this.y+=this.vy;this.x+=this.vx;this.angle+=this.spin;if(this.y>PC.height+20)this.reset();}draw(){px.save();px.translate(this.x,this.y);px.rotate(this.angle);px.globalAlpha=this.a*.45;px.fillStyle=this.rose?'rgba(212,99,122,.7)':'rgba(201,169,110,.55)';px.beginPath();px.ellipse(0,0,this.r,this.r*.52,0,0,Math.PI*2);px.fill();px.restore();}}
+for(let i=0;i<30;i++)petals.push(new Petal());
+function animP(){px.clearRect(0,0,PC.width,PC.height);petals.forEach(p=>{p.update();p.draw();});requestAnimationFrame(animP);}
+
+window.addEventListener('load',()=>{
+  setTimeout(()=>{document.getElementById('loader').classList.add('hide');const lk=document.getElementById('lock');lk.classList.add('show');},2500);
+});
+
+const PWD='0415';
+let pin='';
+function kp(d){if(pin.length>=4)return;pin+=d;uD();if(pin.length===4)setTimeout(chkPin,260);}
+function kpDel(){pin=pin.slice(0,-1);uD();}
+function kpClear(){pin='';uD();}
+function uD(){for(let i=0;i<4;i++)document.getElementById('pd'+i).classList.toggle('on',i<pin.length);}
+function chkPin(){
+  if(pin===PWD){
+    document.getElementById('lock').classList.add('unlock');
+    setTimeout(()=>{document.getElementById('lock').style.display='none';document.getElementById('page').style.display='block';initPage();},860);
+  } else {
+    const g=document.getElementById('lglass');g.classList.add('shake');
+    const e=document.getElementById('perr');e.classList.add('show');
+    setTimeout(()=>{g.classList.remove('shake');e.classList.remove('show');pin='';uD();},1300);
+  }
+}
+
+function initPage(){
+  animP();
+  initFW();
+  initSR();
+}
+
+function initSR(){
+  const els=document.querySelectorAll('.sr');
+  const obs=new IntersectionObserver(entries=>{
+    entries.forEach(e=>{if(e.isIntersecting){e.target.classList.add('in');obs.unobserve(e.target);}});
+  },{threshold:.12});
+  els.forEach(el=>obs.observe(el));
+}
+
+function initFW(){
+  const cv=document.getElementById('cfw');
+  function sz(){cv.width=cv.offsetWidth;cv.height=cv.offsetHeight;}sz();
+  window.addEventListener('resize',sz);
+  const ctx=cv.getContext('2d'),pts=[];
+  const cols=['#d4637a','#c9a96e','#f2aab8','#fff','#b49dc8','#ffd700','#ff85a1'];
+  class P{constructor(x,y,c){this.x=x;this.y=y;const a=Math.random()*Math.PI*2,s=Math.random()*5.5+1;this.vx=Math.cos(a)*s;this.vy=Math.sin(a)*s;this.a=1;this.c=c;this.sz=Math.random()*2.5+.7;}step(){this.x+=this.vx;this.y+=this.vy;this.vy+=.065;this.a-=.016;}draw(){ctx.save();ctx.globalAlpha=Math.max(0,this.a);ctx.fillStyle=this.c;ctx.beginPath();ctx.arc(this.x,this.y,this.sz,0,Math.PI*2);ctx.fill();ctx.restore();}}
+  function burst(){const x=70+Math.random()*(cv.width-140),y=30+Math.random()*(cv.height*.55),c=cols[~~(Math.random()*cols.length)];for(let i=0;i<58;i++)pts.push(new P(x,y,c));}
+  function loop(){ctx.clearRect(0,0,cv.width,cv.height);pts.forEach(p=>{p.step();p.draw();});for(let i=pts.length-1;i>=0;i--)if(pts[i].a<=0)pts.splice(i,1);requestAnimationFrame(loop);}
+  loop();burst();setInterval(burst,1800);
+}
+</script>
+</body>
+</html>
